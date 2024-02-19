@@ -33,13 +33,17 @@ var logpath string
 */
 var channelFile chan string
 
-func Start(path string, LogToConsole bool, chanelSize int) error {
+var logtrace bool 
+
+func Start(path string, LogToConsole, LogTrace bool, chanelSize int) error {
 
 	if string(path[len(path)-1:]) != "/" {
 		path = path + "/"
 	}
 	logpath = path
 
+	logtrace = LogTrace 
+	
 	channelFile = make(chan string, chanelSize)
 
 	go func() {
@@ -117,6 +121,15 @@ func log_msg(s, logtype, filename string, line int) {
 /*
 	Write a log message in the file
 */
+func Trace(s string) {
+	if !logtrace {
+		return
+	}
+	_, filename, line, _ := runtime.Caller(1)
+	log_msg(s, "TRACE", filename, line)
+}
+
+
 func Info(s string) {
 	_, filename, line, _ := runtime.Caller(1)
 	log_msg(s, "INFO ", filename, line)
